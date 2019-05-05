@@ -18,36 +18,36 @@
 
 ```swift
 extension UIViewController {
-
-private struct AssociateKeys {
-static var loadingKey = "UIViewController+Extension+Loading"
-}
-//动画视图
-var loading: LOTAnimationView? {
-get {
-return objc_getAssociatedObject(self, &AssociateKeys.loadingKey) as? LOTAnimationView
-}
-set {
-objc_setAssociatedObject(self, &AssociateKeys.loadingKey, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-}
-}  
-//显示动画
-func showUtimesLoading() {
-if self.loading == nil {
-loading = LOTAnimationView(name: "loading_bubble")
-loading!.frame.size = CGSize(width: 100, height: 100)
-loading!.center = self.view.center
-}
-self.view.addSubview(self.loading!)
-self.loading!.play()
-}
-
-//移除动画
-func hideUtimeLoading(){
-if let loading = self.loading {
-loading.removeFromSuperview()
-}
-}
+    
+    private struct AssociateKeys {
+        static var loadingKey = "UIViewController+Extension+Loading"
+    }
+    //动画视图
+    var loading: LOTAnimationView? {
+        get {
+            return objc_getAssociatedObject(self, &AssociateKeys.loadingKey) as? LOTAnimationView
+        }
+        set {
+            objc_setAssociatedObject(self, &AssociateKeys.loadingKey, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }  
+      //显示动画
+    func showUtimesLoading() {
+        if self.loading == nil {
+            loading = LOTAnimationView(name: "loading_bubble")
+            loading!.frame.size = CGSize(width: 100, height: 100)
+            loading!.center = self.view.center
+        }
+        self.view.addSubview(self.loading!)
+        self.loading!.play()
+    }
+    
+    //移除动画
+    func hideUtimeLoading(){
+        if let loading = self.loading {
+            loading.removeFromSuperview()
+        }
+    }
 }
 ```
 
@@ -59,13 +59,13 @@ loading.removeFromSuperview()
 
 ```swift
 override func viewDidLoad() {
-super.viewDidLoad()
-let myView = UIView()
-let ges = UITapGestureRecognizer(target: self, action: #selector(tapMyView))
-myView.addGestureRecognizer(ges)
+    super.viewDidLoad()
+    let myView = UIView()
+    let ges = UITapGestureRecognizer(target: self, action: #selector(tapMyView))
+    myView.addGestureRecognizer(ges)
 }
 @objc func tapMyView() {
-print("tap my view")
+    print("tap my view")
 }
 ```
 
@@ -73,7 +73,7 @@ print("tap my view")
 
 ```swift
 myView.setTapActionWithClosure {
-print("tap my view")
+    print("tap my view")
 }
 ```
 
@@ -83,31 +83,31 @@ print("tap my view")
 
 ```swift
 extension UIView {
-// 定义手势和闭包关联的Key
-private struct AssociateKeys {
-static var gestureKey = "UIView+Extension+gestureKey"
-static var closureKey = "UIView+Extension+closureKey"
-}
-// 为view添加点击事件
-func setTapActionWithClosure(_ closure: @escaping ()->()) {
-var gesture = objc_getAssociatedObject(self, &AssociateKeys.gestureKey)
-if gesture == nil {
-gesture = UITapGestureRecognizer(target: self, action: #selector(handleActionForTapGesture(_:)))
-addGestureRecognizer(gesture as! UIGestureRecognizer)
-isUserInteractionEnabled = true
-objc_setAssociatedObject(self, &AssociateKeys.gestureKey, gesture, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-}
-objc_setAssociatedObject(self, &AssociateKeys.closureKey, closure, objc_AssociationPolicy.OBJC_ASSOCIATION_COPY)
-}
-// 点击手势实际调用的函数
-@objc private func handleActionForTapGesture(_ gesture: UITapGestureRecognizer) {
-if gesture.state == UIGestureRecognizer.State.recognized {
-let obj = objc_getAssociatedObject(self, &AssociateKeys.closureKey)
-if let action = obj as? ()->() {
-action()
-}
-}
-}
+    // 定义手势和闭包关联的Key
+    private struct AssociateKeys {
+        static var gestureKey = "UIView+Extension+gestureKey"
+        static var closureKey = "UIView+Extension+closureKey"
+    }
+    // 为view添加点击事件
+    func setTapActionWithClosure(_ closure: @escaping ()->()) {
+        var gesture = objc_getAssociatedObject(self, &AssociateKeys.gestureKey)
+        if gesture == nil {
+            gesture = UITapGestureRecognizer(target: self, action: #selector(handleActionForTapGesture(_:)))
+            addGestureRecognizer(gesture as! UIGestureRecognizer)
+            isUserInteractionEnabled = true
+            objc_setAssociatedObject(self, &AssociateKeys.gestureKey, gesture, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+        objc_setAssociatedObject(self, &AssociateKeys.closureKey, closure, objc_AssociationPolicy.OBJC_ASSOCIATION_COPY)
+    }
+    // 点击手势实际调用的函数
+    @objc private func handleActionForTapGesture(_ gesture: UITapGestureRecognizer) {
+        if gesture.state == UIGestureRecognizer.State.recognized {
+            let obj = objc_getAssociatedObject(self, &AssociateKeys.closureKey)
+            if let action = obj as? ()->() {
+                action()
+            }
+        }
+    }
 }
 ```
 
