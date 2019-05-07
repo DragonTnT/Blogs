@@ -2,7 +2,7 @@
 
 ---
 
-####先说下安装的顺序：
+#### 先说下安装的顺序：
 
 1.下载开发工具和编辑器：Android Studio，Xcode，VSCode
 
@@ -43,7 +43,7 @@ export PATH=PATH_TO_FLUTTER_GIT_DIRECTORY/flutter/bin:$PATH  //PATH_TO_FLUTTER_G
 
 ---
 
-####最后谈谈Flutter
+#### 最后谈谈Flutter
 
 优点：
 
