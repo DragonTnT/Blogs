@@ -1,14 +1,52 @@
-## Swift中的runtime
+## Swift开发中关于runtime的使用
 
 ---
 
-为什么要用这个标题呢？做过iOS开发的同学都知道，runtime是OC这门动态语言的一大特性。我们为分类添加属性，或者hook某个方法都会用到runtime。因为运行时特性，OC也被认为是一门`动态语言`。
+做过iOS开发的同学都知道，runtime是OC这门动态语言的一大特性。我们为分类添加属性，或者hook某个方法都会用到runtime。因为运行时特性，OC也被认为是一门`动态语言`。
 
 而Swift作为一门`静态语言`，它的类型判断和函数调用在编译时已经决定。那么，本文将介绍为何要在Swift中使用runtime，以及如何使用。
 
 ---
 
-#### 通过runtime为类添加关联属性
+#### 获取类的所有属性和方法
+
+```swift
+class RuntimeHelper {
+    //获取所有属性
+    class func getAllIvars<T>(from type: T.Type) {
+        var count: UInt32 = 0
+        let ivars = class_copyIvarList(type as? AnyClass, &count)
+        for index in 0..<count {
+            guard let ivar = ivars?[Int(index)] else { continue }
+            guard let namePointer = ivar_getName(ivar) else { continue }
+            guard let name = String.init(utf8String: namePointer) else { continue }
+            print("ivar_name: \(name)")
+        }
+    }
+    //获取所有方法
+    class func getAllMethods<T>(from type: T.Type) {
+        var count: UInt32 = 0
+        let methods = class_copyMethodList(type as? AnyClass, &count)
+        for index in 0..<count {
+            guard let method = methods?[Int(index)] else { continue }
+            let selector = method_getName(method)
+            let name = NSStringFromSelector(selector)
+            print("method_name: \(name)")
+        }
+    }
+}
+```
+
+这里封装了两个类方法，用于获取一个类的所有属于和方法。
+
+```swift
+//获取UIView的所有属性
+RuntimeHelper.getAllIvars(from: UIView.self)
+```
+
+---
+
+#### 为类添加关联属性
 
 为一个类增加方法，我们很容易想到在extension中添加。那么添加属性，我们自然也会想要在extension中实现。
 
