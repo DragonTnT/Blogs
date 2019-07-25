@@ -29,6 +29,22 @@ func convert(_ point: CGPoint, to view: UIView?) -> CGPoint
 - `scaleAspectFit`：等比例显示全图``
 - `center`，`top` 等显示了位置
 
+##### 部分圆角：
+
+```swift
+let view = UIView()
+        view.backgroundColor = .blue
+        view.frame = CGRect(x: 100, y: 100, width: 100, height: 100)
+let maskPath = UIBezierPath(roundedRect: view.bounds,
+                                    byRoundingCorners: [.topLeft,.topRight],
+                                    cornerRadii: CGSize(width: 8.0, height: 0.0))
+let maskLayer = CAShapeLayer()
+maskLayer.path = maskPath.cgPath        
+view.layer.mask = maskLayer
+```
+
+用贝塞尔曲线画出view的轨迹
+
 ---
 
 
