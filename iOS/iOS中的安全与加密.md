@@ -1,32 +1,37 @@
 # iOS中的安全与加密
 
+Charles是大家所熟悉的抓包工具，如果网络请求未经过双向认证，那么我们可以通过Charles拿到请求的参数和返回，具体的操作方法请看[这里](https://juejin.im/post/5a30a52a6fb9a0451d4175ed)。它的原理简单的概括为Charles伪装为服务器与客户端通信。可以选择将传输的所有数据都进行加密，但如果数据量较大时，加解密会影响通信的时间。这里介绍两种防止抓包的方法：
+
+- HTTPS双向认证
+- 禁用代理
+
 ---
 
-###一。HTTPS双向认证
+###HTTPS双向认证：
 
-Charles是大家所熟悉的抓包工具，如果网络请求未经过双向认证，那么我们可以通过Charles拿到请求的参数和返回，具体的操作方法请看[这里](https://juejin.im/post/5a30a52a6fb9a0451d4175ed)。它的原理简单的概括为Charles伪装为服务器与客户端通信。那么**双向认证**要做的工作就是在服务器与客户端之间**相互验证**，避免数据被Charles这类的中间人截取。
+**双向认证**要做的工作就是在服务器与客户端之间**相互验证**，避免数据被Charles这类的中间人截取。
 
-
-
-#### 准备工作
+#### 一、准备工作：
 
 #####1.服务端会向我们提供.pem证书和.key密钥
 
 ##### 2.将.pem导为.cer文件
 
 ```openss
-openssl x509 -inform der -in certificate.cer -out certificate.pem
+openssl x509 -inform pem -in  youchelai.pem -outform der -out youchelai.cer
 ```
 
-#####3.将.pem和.key导为p12文件
+#####3.将.pem和.key导为p12文件(注意p12需要.pem和.key一起导出)
 
 ```
-openssl pkcs12 -export -in certificate.pem -inkey chejinjia.key -out certificate.p12
+openssl pkcs12 -export -in youchelai.pem -inkey youchelai.key -out youchelai.p12
 ```
+
+注意导出时需要设置密码，在代码中需要将密码带入。
+
+#### 二、iOS客户端代码
 
 ##### 4.这里的设置是以swift语言，并且Alamofire请求为基础的，注意将代码里的.cer和p12换成真实的名字
-
-
 
 ```swift
 import Alamofire
@@ -73,7 +78,7 @@ class UtimesNetWorkConfig {
           }
       }
       
-      //将本地证书发送到服务端认证
+      //将p12文件发送到服务端认证（p12由证书和公钥生成）
       private func sendClientP12() -> SessionChallenge {
           var identityAndTrust:IdentityAndTrust!
           var securityError:OSStatus = errSecSuccess
@@ -81,7 +86,7 @@ class UtimesNetWorkConfig {
           let path: String = Bundle.main.path(forResource: "chejinjia", ofType: "p12") ?? ""
           let PKCS12Data = NSData(contentsOfFile:path)!
           let key : NSString = kSecImportExportPassphrase as NSString
-          let options : NSDictionary = [key : "你的P12文件的密码"] //客户端证书密码
+          let options : NSDictionary = [key : "你的P12文件的密码"] //P12导出时的密码
           var items : CFArray?
           
           securityError = SecPKCS12Import(PKCS12Data, options, &items)
@@ -120,11 +125,47 @@ class UtimesNetWorkConfig {
 
 由此，Charles一类的抓包工具已经无法再抓取到网络请求了。
 
+#### 注意：
+
+如果服务端的证书过期需要更换，那么app里的证书也需要更换，存在的问题就是app需要重新打包上传，如果用户没有更新app，则无法访问服务器；因此使用双向认证要提前规划，例如购买使用年限长的证书，或从服务端动态下载证书。也可以使用公钥验证，即从服务端获取的证书里取到公钥，和本地证书里的公钥对比，（当证书使用自定义的CSR文件时，公钥会保持不变）。
+
 ---
+
+### 禁用代理：
+
+Charles一般会使用电脑作为手机的代理和服务端进行通信，因此如果在app内检测到代理，则我们可以选禁止网络请求。
+
+```swift
+public class func isUsedProxy() -> Bool {
+    guard let proxy = CFNetworkCopySystemProxySettings()?.takeUnretainedValue() else { 			return false }
+    guard let dict = proxy as? [String: Any] else { return false }
+    guard let HTTPProxy = dict["HTTPProxy"] as? String else { return false }
+    //如果使用了代理，则HTTPProxy不为空，值为代理的ip地址
+    return !HTTPProxy.isEmpty
+}
+```
+
+我们可以将该方法封装在网络请求的基类里，每次请求前判断网络是否使用代理，如果使用，则禁止请求。
+
+当然测试人员进行测试时，可能会使用代理，因此我们应该把该判断放入Release模式，仅在生产环境下判断。
+
+```swift
+#if Release
+if !ProxyCheck.isUsedProxy() {
+		// do network
+} else {
+	  HUD.flash(.labeledError(title: nil, subtitle: "代理禁止访问"), delay: 0.5)
+}
+#endif
+```
+
+当然这种方法也会有一些不方便的地方，例如有时候手机使用代理翻墙，那么此时访问禁用代理的app，就不能进行请求了。
+
+
 
 ###二。AES
 
-虽然用了HTTPS双向认证，可我们的安全系数还是不够高。因为请求的参数实际上还是明文。比较敏感的参数例如密码，我们还应该将它再次加密。
+上面的处理并不完善，因为请求的参数实际上还是明文。比较敏感的参数例如密码，我们还应该将它再次加密。
 
 这里介绍一下如果使用第三方库`CryptoSwift`进行AES加密
 

@@ -57,6 +57,20 @@ view.layer.mask = maskLayer
 
 该属性比frame大时，scrollView才能滑动。通过IB或Storyboard布局时，注意在controller的`viewDidLayoutSubviews`里对`contentSize`赋值。
 
+
+
+##### 去掉屏幕顶部为scrollView预留的空间
+
+```swift
+if #available(iOS 11.0, *) {
+    scrollView.contentInsetAdjustmentBehavior = .never
+} else {
+    automaticallyAdjustsScrollViewInsets = false
+}
+```
+
+
+
 ---
 
 ### UITableView
@@ -71,6 +85,16 @@ view.layer.mask = maskLayer
 
 在iOS11以后，刷新列表可能会出现闪动的现象。这里需要将`estimatedRowHeight`,`estimatedSectionHeaderHeight`,`estimatedSectionFooterHeight`都设为0即可消除闪动
 
+##### UITableView.Style
+
+当style为group时，section的header和footer都不会在滑动时停留。此时的tableView会给默认的header和footer的视图和高度。若要设置header为空，则应在heightForHeader中返回0，并且在viewForHeader中返回nil
+
+##### Self-sizing cell
+
+当cell里嵌套tableView这类没有实现`intrinsicContentSize`的视图时，除了需要设置tableView到上下距离，还要设置tableView的高度。可以监听tableView的contentSize，设置它的高度。
+
+当cell因为布局复杂，导致自适应高度失败，可以尝试在cellForRow的方法里，返回cell之前，调用cell.layoutIfNeed。
+
 ### UITextfiled
 
 ---
@@ -82,4 +106,12 @@ view.layer.mask = maskLayer
 - 当需要限制输入类型时，在代理方法`shouldChangeCharactersIn`中做判断
 - 当需要限制输入长度时，为textfield添加editingChanged的监听，并对text做substring。
 - 当需要以上两点同时发生作用时，KeyboardType应该转为ASCII。
+
+
+
+### UIButton
+
+---
+
+btn.semanticContentAttribute = .forceRightToLeft  可用以文字和图片的左右位置对调
 
