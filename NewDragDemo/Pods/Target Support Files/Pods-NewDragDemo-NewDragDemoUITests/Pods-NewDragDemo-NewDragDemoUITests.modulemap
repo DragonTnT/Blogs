@@ -1,0 +1,6 @@
+framework module Pods_NewDragDemo_NewDragDemoUITests {
+  umbrella header "Pods-NewDragDemo-NewDragDemoUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}

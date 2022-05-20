@@ -12,3 +12,7 @@
 
 将视图的整个边界矩形标记为需要重绘。
 
+4.Autolayout:
+
+https://www.jianshu.com/p/c8efc7014800
+

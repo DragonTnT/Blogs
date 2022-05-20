@@ -107,6 +107,34 @@ if #available(iOS 11.0, *) {
 - 当需要限制输入长度时，为textfield添加editingChanged的监听，并对text做substring。
 - 当需要以上两点同时发生作用时，KeyboardType应该转为ASCII。
 
+##### 小写转大写
+
+监听textfield的editingChanged
+
+```swift
+/// 输入小写转大写
+@objc private func editingChanged(textfield: UITextField) {
+    guard let text = textfield.text,
+          let languague = textfield.textInputMode?.primaryLanguage,
+          languague == englishLanguague
+    else { return }
+    searchTF.text = text.uppercased()
+}
+```
+
+##### 限制输入长度
+
+监听textfield的editingChanged
+
+```swift
+@objc private func textfiledEditingChanged() {
+    let text = numberTF.text!
+    if text.count > 3 {
+        numberTF.text = text.substring(from: 0, to: 2)
+    }
+}
+```
+
 
 
 ### UIButton
@@ -115,3 +143,33 @@ if #available(iOS 11.0, *) {
 
 btn.semanticContentAttribute = .forceRightToLeft  可用以文字和图片的左右位置对调
 
+
+
+### UICollectionView
+
+---
+
+1.reloadData不执行cellforitem: 
+
+考虑是否有viewDidLoad未完成的情况下，调用了reloadData，这会导致后续的reloadData无法调用cellforitem。考虑使用：
+
+```
+if isViewLoad {
+	 collectionView.reloadData()
+}
+```
+
+2.reloadData后header、footer不更新：
+
+```swift
+collectionView.reloadData()
+collectionView.collectionViewLayout.invalidateLayout()
+```
+
+
+
+### Xib
+
+---
+
+直接为xib加载的视图设置frame,可能会出现frame不准确的情况。此时需要将.xib文件中的Autoresizing中的flexiableWidth和flexiableHeight取消选中。即取消弹性视图中的宽高两条线。
