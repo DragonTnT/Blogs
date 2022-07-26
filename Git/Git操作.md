@@ -81,7 +81,7 @@ git cherry-pick xsd7834yduf    当前分支合并commit"xsd7834yduf"
 
 pull是将远端代码直接合入工作区。
 
-fetch是先将远端代码拉入本地仓库，但并不影响工作区，自己再考虑是否通过git merge加入工作区。但是git fetch之后，不方便查看拉下来的变动。因此建议使用 git merge --no-ff，这样无论如何都会产生一个新的 merge commit。然后git show <merge-commit-sha1> 就可以看到这次 merge 的所有改动。最后可以考虑使用git rebase合并commit。
+fetch是先将远端代码拉入本地仓库，但并不影响工作区，自己可通过git diff查看区别，再决定是否通过git merge合并到工作区。但是git fetch之后，不方便查看拉下来的变动。因此建议使用 git merge --no-ff，这样无论如何都会产生一个新的 merge commit。然后git show <merge-commit-sha1> 就可以看到这次 merge 的所有改动。最后可以考虑使用git rebase合并commit。
 
 
 
@@ -133,3 +133,17 @@ git rebase --skip
 ```
 
 来跳过， 就可以了
+
+
+
+#### 十三：将工作区直接提交到本地仓库
+
+```
+git commit -a -m"xxx" 或者 git commit -am""
+```
+
+
+
+#### 十四：
+
+commit内容较长时，不宜直接commit -m""，而是应该先git commit，进入vim界面，再写commit描述
