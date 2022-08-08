@@ -147,3 +147,12 @@ git commit -a -m"xxx" 或者 git commit -am""
 #### 十四：
 
 commit内容较长时，不宜直接commit -m""，而是应该先git commit，进入vim界面，再写commit描述
+
+#### 十五：设置git token
+
+```shell
+1.git clone 以后提示输入账户和密码，其中密码直接输入token
+2.在clone下来的项目输入以下指令，以后就可以直接Push，不需要再输入token
+git remote set-url origin https://<your token>@github.com/<USERNAME>/<REPO>.git
+```
+
