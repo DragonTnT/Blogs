@@ -2,8 +2,8 @@
 
 开启：
 
-git config --global http.proxy http://127.0.0.1:1087   //（具体代理地址取决于代理设置）
-git config --global https.proxy https://127.0.0.1:1087
+git config --global http.proxy http://127.0.0.1:7890   //（具体代理地址取决于代理设置）
+git config --global https.proxy https://127.0.0.1:7890
 
 git config --global http.sslVerify false
 

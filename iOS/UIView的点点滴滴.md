@@ -87,7 +87,19 @@ if #available(iOS 11.0, *) {
 
 ##### UITableView.Style
 
-当style为group时，section的header和footer都不会在滑动时停留。此时的tableView会给默认的header和footer的视图和高度。若要设置header为空，则应在heightForHeader中返回0，并且在viewForHeader中返回nil
+当style为group时，section的header和footer都不会在滑动时停留。此时的tableView会给默认的header和footer的视图和高度。若要设置header为空，则应在heightForHeader中返回0，并且在viewForHeader中返回nil。  
+
+##### 在iOS15以上，UITableView有sectionHeader或sectionFooter时，顶部会出现空白区域
+
+```swift
+if #available(iOS 15, *) {
+    tableView.sectionHeaderTopPadding = 0
+}
+```
+
+
+
+
 
 ##### Self-sizing cell
 
@@ -135,6 +147,10 @@ if #available(iOS 11.0, *) {
 }
 ```
 
+##### attributePlaceholder显示异常
+
+当设置了font，但font显示不正常时，在layoutSubviews里设置就可以了
+
 
 
 ### UIButton
@@ -173,3 +189,9 @@ collectionView.collectionViewLayout.invalidateLayout()
 ---
 
 直接为xib加载的视图设置frame,可能会出现frame不准确的情况。此时需要将.xib文件中的Autoresizing中的flexiableWidth和flexiableHeight取消选中。即取消弹性视图中的宽高两条线。
+
+
+
+### UILabel
+
+1.遇到宽度偏差很小，导致文字显示省略号的情况，直接更改`lineBreakMode`为`byClipping`
