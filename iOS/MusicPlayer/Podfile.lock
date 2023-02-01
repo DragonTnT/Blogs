@@ -1,0 +1,16 @@
+PODS:
+  - KDEAudioPlayer (1.1.0)
+
+DEPENDENCIES:
+  - KDEAudioPlayer
+
+SPEC REPOS:
+  trunk:
+    - KDEAudioPlayer
+
+SPEC CHECKSUMS:
+  KDEAudioPlayer: b3787f02b6718c2416589a7726f2633cde2cd60e
+
+PODFILE CHECKSUM: 0cd7b345ca5f064aacb1c6979961d0ffaa647a9d
+
+COCOAPODS: 1.11.3

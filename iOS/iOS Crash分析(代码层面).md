@@ -1,4 +1,4 @@
-# iOS Crash分析
+# iOS Crash分析(代码层面)
 
 首先来说说容易造成Crash的原因：
 
@@ -44,3 +44,6 @@
 2.NSArray一类的容器越界：
 
 解决办法：通过MethodSwizzling对的NSArray的`objectAtIndexedSubscript`方法进行替换
+
+
+
