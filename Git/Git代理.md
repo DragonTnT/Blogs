@@ -2,7 +2,8 @@
 
 开启：
 
-git config --global http.proxy http://127.0.0.1:7890   //（具体代理地址取决于代理设置）
+// 127.0.0.1为本地主机IP地址，7890为代理所使用的端口号，具体端口号可在classX的帮助中查询
+git config --global http.proxy http://127.0.0.1:7890   //（）
 git config --global https.proxy https://127.0.0.1:7890
 
 git config --global http.sslVerify false

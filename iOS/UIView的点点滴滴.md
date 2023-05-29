@@ -199,6 +199,23 @@ tableView.estimatedSectionFooterHeight = 0
 
 当设置了font，但font显示不正常时，在layoutSubviews里设置就可以了
 
+##### 限制中文的输入长度，但不想输入拼音被截断时用`markedTextRange == nil`来判断
+
+```
+merchantNameTF.rx.text
+    .subscribe { [weak self] text in
+    guard let self = self,
+          self.merchantNameTF.markedTextRange == nil,
+          var text = text
+        else { return }
+        if text.count > 6 {
+            text = text.substring(from: 0, to: 5)
+        }
+        self.merchantNameTF.text = text
+}
+.disposed(by: disposeBag)
+```
+
 
 
 ##### 完成及时搜索功能，及输入文本就开始搜索，但在文字还是拼音的时候，不搜索
@@ -253,6 +270,22 @@ collectionView.reloadData()
 collectionView.collectionViewLayout.invalidateLayout()
 ```
 
+3.使用selfSizingCell，如果返回的宽高不对，可以在cell中实现
+
+```swift
+override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+  self.setNeedsLayout()
+  self.layoutIfNeeded()
+  let size = self.contentView.systemLayoutSizeFitting(layoutAttributes.size)
+  var cellFrame = layoutAttributes.frame
+  cellFrame.size.height = size.height
+  // 此处的需求为宽度固定为150，高度随内容而撑开
+  cellFrame.size.width = 150 
+  layoutAttributes.frame = cellFrame
+  return layoutAttributes
+}
+```
+
 
 
 ### Xib
@@ -263,11 +296,19 @@ collectionView.collectionViewLayout.invalidateLayout()
 
 2.如果xib加载控制器，需要注意file's owner的customClass需要指定为控制器类型
 
+### instrinsicSize
 
+UILabel、UIImageView、UIButton此类控件会根据本身的内容，而拥有一个内在的size，不设置frame或约束，也能够显示。可对其重写来完成某些功能，例如带有边距的label
 
 ### UILabel
 
 1.遇到宽度偏差很小，导致文字显示省略号的情况，直接更改`lineBreakMode`为`byClipping`
+
+
+
+### UImageView
+
+UIImageView可以根据本地图片的内容而撑开size，在snapkit中，不用定义对size的约束，而在xib中，可以对UIImageView在设置完位置约束后，会出现instrinsicSize，将其改为placeHolder，设置任意值，就不用再设置宽高的约束，在runtime中，UIImageView会拿到它内容的宽高
 
 
 
@@ -293,3 +334,7 @@ layer.backgroundColor = UIColor.clear.cgColor
 - UIKeyboardTypeDecimalPad：数字和小数，常用于输入金额
 - UIKeyboardTypeNumberPad：只有数字
 - UIKeyboardTypeASCIICapable：字母和数字，常用于输入密码
+
+### UITextView:
+
+textView的高度随内容变化，参考AutoLineBreakTextView
